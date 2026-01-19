@@ -1,0 +1,41 @@
+networks:
+  opamp-network:
+    driver: bridge
+
+services:
+  opamp-server:
+    # image: ghcr.io/open-telemetry/opamp-go/opamp-server-example:latest
+    container_name: opamp-server
+    image: opamp-server:latest
+    build:
+      context: ./src/docker
+      dockerfile: Dockerfile.opamp-server
+    ports:
+      - "4320:4320"
+      - "4321:4321"
+    networks:
+      - opamp-network
+    restart: unless-stopped
+    # stop_grace_period: 1s
+
+  # OpenTelemetry Collector
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.143.0
+    container_name: otelcol
+    deploy:
+      resources:
+        limits:
+          memory: 125M
+    restart: unless-stopped
+    command: [ "--config=/etc/otelcol-contrib/config.yaml"]
+    volumes:
+      - ./src/otel-collector/otelcol-config.yaml:/etc/otelcol-contrib/config.yaml
+    depends_on:
+      opamp-server:
+        condition: service_started
+    networks:
+      - opamp-network
+
+    # ports:
+    #   - "4317:4317"
+    #   - "4318:4318"

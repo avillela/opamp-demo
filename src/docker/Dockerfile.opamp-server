@@ -1,0 +1,21 @@
+# ------------------------------------------------------------
+# 1. Build stage
+# ------------------------------------------------------------
+FROM golang:1.24
+
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+RUN git clone https://github.com/open-telemetry/opamp-go.git .
+
+COPY startup.sh .
+RUN chmod +x startup.sh
+
+EXPOSE 4320
+EXPOSE 4321
+
+# CMD ["go", "run", "internal/examples/server/main.go"]
+# CMD ["cd internal/examples/server", "sh"]
+# CMD ["sh"]
+ENTRYPOINT [ "./startup.sh" ]
