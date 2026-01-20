@@ -1,5 +1,9 @@
 # ------------------------------------------------------------
-# 1. Build stage
+# This is a very crappy Dockerfile build of the Go OpAMP Server, 
+# but it's good enough for the purposes of this example.
+#
+# For a better version checck out: 
+# https://github.com/open-telemetry/opamp-go/blob/main/internal/examples/Dockerfile.server
 # ------------------------------------------------------------
 FROM golang:1.24
 
@@ -15,7 +19,4 @@ RUN chmod +x startup.sh
 EXPOSE 4320
 EXPOSE 4321
 
-# CMD ["go", "run", "internal/examples/server/main.go"]
-# CMD ["cd internal/examples/server", "sh"]
-# CMD ["sh"]
 ENTRYPOINT [ "./startup.sh" ]
