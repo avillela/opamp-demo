@@ -3,17 +3,31 @@ networks:
     driver: bridge
 
 services:
-  opamp-supervisor:
-    container_name: opamp-supervisor
+
+  opamp-supervisor-1:
+    container_name: opamp-supervisor-1
+    image: otel/opentelemetry-collector-opampsupervisor:latest
+    command: ["--config", "/etc/otel/supervisor.yaml"]
+    volumes:
+      - ./src/opamp-supervisor/supervisor.yaml:/etc/otel/supervisor.yaml
+      - ./src/opamp-supervisor/supervisor-data:/etc/otel/supervisor-data
+      - ./src/otel-collector/otelcol-config-2.yaml:/otelcol-config.yaml
+      - /usr/local/bin/otelcol-contrib:/otelcolcontrib
+    networks:
+      - opamp-network
+    restart: unless-stopped
+
+  opamp-supervisor-2:
+    container_name: opamp-supervisor-2
     image: opamp-supervisor:latest
     command: ["--config", "/etc/otel/supervisor.yaml"]
     build:
       context: ./src/docker
       dockerfile: Dockerfile.opamp-supervisor
     volumes:
-      - ./src/opamp-supervisor/supervisor.yaml:/etc/otel/supervisor.yaml
+      - ./src/opamp-supervisor/supervisor-2.yaml:/etc/otel/supervisor.yaml
       # - ./src/otel-collector/otelcol-config-base.yaml:/etc/otelcol-contrib/config-base.yaml
-      # - ./src/otel-collector/otelcol-config.yaml:/etc/otelcol-contrib/config.yaml
+      - ./src/otel-collector/otelcol-config.yaml:/otelcol-config.yaml
     networks:
       - opamp-network
     restart: unless-stopped

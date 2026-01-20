@@ -13,7 +13,7 @@ capabilities:
   reports_remote_config: true
 
 agent:
-  executable: /otelcolcontrib
+  executable: /otelcol-contrib
   config_files:
       - /otelcol-config.yaml
 
