@@ -1,3 +1,4 @@
 # Ignore the opamp-go server
 *opamp-go*
 *.DS_Store*
+*supervisor-data*

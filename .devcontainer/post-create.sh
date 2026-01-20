@@ -6,3 +6,10 @@
 
 sed -i -e "s/#alias ll='ls -l'/alias ll='ls -al'/g" ~/.bashrc
 . $HOME/.bashrc
+
+
+### -------------------
+### Install the OTel Collector binary
+### -------------------
+
+./install-otelcol-contrib.sh
