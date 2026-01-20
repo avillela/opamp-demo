@@ -3,12 +3,7 @@
 
 ## Setup
 
-### Use Case 1 - OpAMP Server + OpAMP Client
-
-References: 
-* [OpenTelemetry OpAMP: Getting Started Guide](https://getlawrence.com/blog/OpenTelemetry-OpAMP--Getting-Started-Guide)
-* [OpenTelemetry at Scale: Controlling your Fleet with OpAMP](https://dev.to/agardnerit/opentelemetry-at-scale-controlling-your-fleet-49m2)
-* [OpAMP Go Server](https://github.com/open-telemetry/opamp-go/blob/main/internal/examples/docker-compose.yml#L16-L31)
+### Use Case 1 - OpAMP Server + OTel Collector
 
 1- Run the OpAMP Server
 
@@ -53,6 +48,32 @@ The OpAMP Go server is just one example of an OpAMP server. You can create your 
 * [OpAMP Elixir server (Jacob Aronoff)](https://github.com/jaronoff97/opamp-elixir)
 * [OpAMP Python server (Adam Gardner)](https://github.com/agardnerIT/opamp-server-py)
 
+### Use Case 2 - OpAMP Server + OpAMP Supervisor + OTel Collector
+
+1- Start the OpAMP server
+
+Open up a new terminal window and run:
+
+```bash
+docker compose up opamp-server
+```
+
+2- Start the OpAMP supervisor
+
+Open up a new terminal window and run:
+
+```bash
+docker compose up opamp-supervisor
+```
+
+3- Start the OTel Collector
+
+Open up a new terminal window and run:
+
+```bash
+docker compose up otel-collector
+```
+
 ## Gotchas
 
 ### 1- Make sure that the OpAMP extension is added to the pipeline
@@ -84,3 +105,11 @@ extensions:
 The endpoint must always start with `wss://`, and for insecure endpoints, set the `tls` to `insecure_skip_verify: true`.
 
 The name of the OpAMP server used above is `opamp-server`, because it is the name of the OpAMP service defined in [`docker-compose.yaml`](/docker-compose.yaml)
+
+## Resources/Rerences
+
+* [OpenTelemetry OpAMP: Getting Started Guide](https://getlawrence.com/blog/OpenTelemetry-OpAMP--Getting-Started-Guide)
+* [OpenTelemetry at Scale: Controlling your Fleet with OpAMP](https://dev.to/agardnerit/opentelemetry-at-scale-controlling-your-fleet-49m2)
+* [OpAMP Supervisor](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/cmd/opampsupervisor/README.md)
+* [OpAMP Extension](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/opampextension#example)
+* [#otel-opamp channel on CNCF Slack](https://cloud-native.slack.com/archives/C02J58HR58R)

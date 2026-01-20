@@ -1,0 +1,17 @@
+FROM otel/opentelemetry-collector-opampsupervisor:latest as supervisor
+
+# Get OpenTelemetry collector
+FROM otel/opentelemetry-collector-contrib:latest AS col
+
+# Final stage
+FROM alpine:latest
+
+# Copy from builder - use the correct source path
+COPY --from=supervisor /usr/local/bin/opampsupervisor ./opampsupervisor
+
+# Copy from OpenTelemetry
+COPY --from=col /otelcol-contrib /otelcol-contrib
+
+EXPOSE 4317 4318
+
+ENTRYPOINT ["./opampsupervisor", "--config", "supervisor.yaml"]

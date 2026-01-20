@@ -1,0 +1,55 @@
+receivers:
+  otlp:
+    protocols:
+      grpc: {}
+      http: {}
+
+processors:
+  batch: {}
+
+exporters:
+  debug:
+    verbosity: basic
+
+extensions:
+  opamp:
+    server:
+      ws:
+        endpoint: wss://opamp-server:4320/v1/opamp
+        tls:
+          insecure_skip_verify: true
+    capabilities:
+      reports_effective_config: true
+
+service:
+  extensions: [opamp]
+  pipelines:
+    traces:
+      receivers: [ otlp ]
+      processors: [ batch ]
+      exporters: [ debug ]
+    metrics:
+      receivers: [ otlp ]
+      processors: [ batch ]
+      exporters: [ debug ]
+    logs:
+      receivers: [ otlp ]
+      processors: [ batch ]
+      exporters: [ debug ]
+
+  telemetry:
+    metrics:
+      level: detailed
+      readers:
+      - periodic:
+          exporter:
+            otlp:
+              endpoint: http://0.0.0.0:4318
+              protocol: http/protobuf
+              temporality_preference: delta
+          interval: 10000
+          timeout: 5000
+    logs:
+      level: debug
+      output_paths: ["stdout"]
+      error_output_paths: ["stderr"]
