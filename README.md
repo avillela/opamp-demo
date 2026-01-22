@@ -1,9 +1,14 @@
-# opamp-demo
+# OpenTelemetry OpAMP Examples for Ordinary People!
 
+This is the companion repository for the NDC London talk, [OpenTelemetry At Scale 101: Intro to OpAMP](https://ndclondon.com/agenda/opentelemetry-at-scale-101-intro-to-opamp-06w1/0ai54vh0exn)
 
-## Setup
+## Tutorials
 
-### Use Case 1 - OpAMP Server + OTel Collector
+### Tutorial 1 - OpAMP Server + OTel Collector with OpAMP Extension
+
+In this scenario, we'll be running the [OpAMP Go Server](https://github.com/open-telemetry/opamp-go/tree/main/internal/examples/server) and an [OTel Collector](https://github.com/open-telemetry/opentelemetry-collector-contrib) with the [OpAMP Extension](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/opampextension).
+
+Since the OpAMP Extension only reports on configuration state, you will not be able to alter the OTel Collector configs in this scenario.
 
 1- Run the OpAMP Server
 
@@ -37,20 +42,14 @@ When you refresh the OpAMP server UI, you should now see your OTel Collector lis
 
 ![OpAMP server](/images/opamp-server-collector.png)
 
-If you click on your OTel Collector, you'll see the Collector config, and a spot to update your config.
+If you click on your OTel Collector, you'll see the Collector config, and a spot to update your config. You can try to update the Collector config, but since the OpAMP Extension is read-only, you won't be able to update the configs.
 
 ![OpAMP server](/images/opamp-server-collector-config.png)
 
-## OpAMP Servers
 
-The OpAMP Go server is just one example of an OpAMP server. You can create your own, or use any of the following open source OpAMP servers:
-* [OpAMP Go server (OpenTelemetry)](https://github.com/open-telemetry/opamp-go/tree/main/internal/examples/server)
-* [OpAMP Elixir server (Jacob Aronoff)](https://github.com/jaronoff97/opamp-elixir)
-* [OpAMP Python server (Adam Gardner)](https://github.com/agardnerIT/opamp-server-py)
+### Tutorial 2 - OpAMP Server + OpAMP Supervisor + OTel Collector
 
-### Use Case 2 - OpAMP Server + OpAMP Supervisor + OTel Collector
-
-In this example, we run 2 OpAMP supervisors with the OpAMP Server. 
+In this example, we run 2 [OpAMP Supervisors](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/cmd/opampsupervisor/README.md) with the [OpAMP Go Server](https://github.com/open-telemetry/opamp-go/tree/main/internal/examples/server). 
 
 The first OpAMP Supervisor uses the OpAMP Supervisor Docker image and references a Collector binary mounted as a volume to the container.
 
@@ -83,6 +82,14 @@ docker compose up opamp-supervisor-2
 You should see 2 collectors registered with the OpAMP Sever.
 
 ![OpAMP server](/images/opamp-server-2-collectors.png)
+
+## OpAMP Servers
+
+The OpAMP Go server is just one example of an OpAMP server. You can create your own, or use any of the following open source OpAMP servers:
+* [OpAMP Go server (OpenTelemetry)](https://github.com/open-telemetry/opamp-go/tree/main/internal/examples/server)
+* [OpAMP Elixir server (Jacob Aronoff)](https://github.com/jaronoff97/opamp-elixir)
+* [OpAMP Python server (Adam Gardner)](https://github.com/agardnerIT/opamp-server-py)
+
 
 ## Gotchas
 
