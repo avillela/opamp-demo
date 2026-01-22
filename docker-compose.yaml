@@ -11,7 +11,7 @@ services:
     volumes:
       - ./src/opamp-supervisor/supervisor.yaml:/etc/otel/supervisor.yaml
       - ./src/opamp-supervisor/supervisor-data:/etc/otel/supervisor-data
-      - ./src/otel-collector/otelcol-config-2.yaml:/otelcol-config.yaml
+      - ./src/otel-collector/otelcol-config.yaml:/otelcol-config.yaml
       - /usr/local/bin/otelcol-contrib:/otelcolcontrib
     networks:
       - opamp-network
@@ -27,7 +27,7 @@ services:
     volumes:
       - ./src/opamp-supervisor/supervisor-2.yaml:/etc/otel/supervisor.yaml
       # - ./src/otel-collector/otelcol-config-base.yaml:/etc/otelcol-contrib/config-base.yaml
-      - ./src/otel-collector/otelcol-config.yaml:/otelcol-config.yaml
+      - ./src/otel-collector/otelcol-config-2.yaml:/otelcol-config.yaml
     networks:
       - opamp-network
     restart: unless-stopped
