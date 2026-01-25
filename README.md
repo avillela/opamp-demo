@@ -1,4 +1,4 @@
-# OpenTelemetry OpAMP Examples for Ordinary People!
+# OpenTelemetry OpAMP Examples for The Rest of Us!
 
 This is the companion repository for the NDC London talk, [OpenTelemetry At Scale 101: Intro to OpAMP](https://ndclondon.com/agenda/opentelemetry-at-scale-101-intro-to-opamp-06w1/0ai54vh0exn)
 
