@@ -12,4 +12,4 @@ sed -i -e "s/#alias ll='ls -l'/alias ll='ls -al'/g" ~/.bashrc
 ### Install the OTel Collector binary
 ### -------------------
 
-./install-otelcol-components.sh
+./install-otel-components.sh
