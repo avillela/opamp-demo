@@ -4,7 +4,30 @@ This is the companion repository for the NDC London talk, [OpenTelemetry At Scal
 
 ## Tutorials
 
-### Tutorial 1 - OpAMP Server + OTel Collector with OpAMP Extension
+These tutorials showcase different ways in which OpAMP works.
+
+### Tutorial 1 - OpAMP Server + OpAMP Supervisor Binary + OTel Collector Binary
+
+In this scenario, both the OpAMP Supervisor and the OpenTelemetry Collector run as native binaries on your local machine. This is the simplest way to understand how the Supervisor manages a Collector and is ideal for both local development and configuring production-ready Supervisors on VMs or bare-metal servers.
+
+1- Start the OpAMP server
+
+Open up a new terminal window and run:
+
+```bash
+docker compose up opamp-server
+```
+
+2- Start the OpAMP Supervisor binary
+
+```bash
+opampsupervisor --config ./src/opamp-supervisor/supervisor-3.yaml
+```
+
+The Supervisor will launch the Collector as a managed subprocess and begin reporting health, logs, metrics, and effective configuration over OpAMP.
+This local-binary setup is recommended for most initial use cases and is the easiest way to understand how OpAMP works end to end.
+
+### Tutorial 2 - OpAMP Server + OTel Collector with OpAMP Extension
 
 In this scenario, we'll be running the [OpAMP Go Server](https://github.com/open-telemetry/opamp-go/tree/main/internal/examples/server) and an [OTel Collector](https://github.com/open-telemetry/opentelemetry-collector-contrib) with the [OpAMP Extension](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/opampextension).
 
@@ -47,7 +70,7 @@ If you click on your OTel Collector, you'll see the Collector config, and a spot
 ![OpAMP server](/images/opamp-server-collector-config.png)
 
 
-### Tutorial 2 - OpAMP Server + OpAMP Supervisor + OTel Collector
+### Tutorial 3 - OpAMP Server + OpAMP Supervisor + OTel Collector
 
 In this example, we run 2 [OpAMP Supervisors](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/cmd/opampsupervisor/README.md) with the [OpAMP Go Server](https://github.com/open-telemetry/opamp-go/tree/main/internal/examples/server). 
 
@@ -71,6 +94,8 @@ Open up a new terminal window and run:
 docker compose up opamp-supervisor-1
 ```
 
+As we saw in Tuorial 1, the Supervisor will launch the Collector binary on the filesystem as a managed subprocess and begin reporting health, logs, metrics, and effective configuration over OpAMP.
+
 3- Start the second OpAMP Supervisor
 
 Open up a new terminal window and run the following command. Note that the first time you run this, it will build the image if it doesn't already exist.
@@ -79,17 +104,23 @@ Open up a new terminal window and run the following command. Note that the first
 docker compose up opamp-supervisor-2
 ```
 
+Again, the Supervisor will launch the Collector as a managed subprocess, but it will do so within the custom Supervisor/Collector combination container.
+
 You should see 2 collectors registered with the OpAMP Sever.
 
 ![OpAMP server](/images/opamp-server-2-collectors.png)
 
+
 ## OpAMP Servers
 
-The OpAMP Go server is just one example of an OpAMP server. You can create your own, or use any of the following open source OpAMP servers:
+The OpAMP Go server is just one example of an OpAMP server. Here are some examples:
 * [OpAMP Go server (OpenTelemetry)](https://github.com/open-telemetry/opamp-go/tree/main/internal/examples/server)
 * [OpAMP Elixir server (Jacob Aronoff)](https://github.com/jaronoff97/opamp-elixir)
 * [OpAMP Python server (Adam Gardner)](https://github.com/agardnerIT/opamp-server-py)
 
+>! 🚨 **NOTE**: These are NOT production-ready servers. Use at your own risk.
+
+You can also write your own OpAMP Server, implementing the [OpAMP protobuf specs](https://opentelemetry.io/docs/specs/opamp/)!
 
 ## Gotchas
 
