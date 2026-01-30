@@ -26,7 +26,6 @@ services:
       dockerfile: Dockerfile.opamp-supervisor
     volumes:
       - ./src/opamp-supervisor/supervisor-2.yaml:/etc/otel/supervisor.yaml
-      # - ./src/otel-collector/otelcol-config-base.yaml:/etc/otelcol-contrib/config-base.yaml
       - ./src/otel-collector/otelcol-config-2.yaml:/otelcol-config.yaml
     networks:
       - opamp-network
@@ -45,7 +44,6 @@ services:
     networks:
       - opamp-network
     restart: unless-stopped
-    # stop_grace_period: 1s
 
   # OpenTelemetry Collector
   otel-collector:
@@ -65,6 +63,3 @@ services:
     networks:
       - opamp-network
 
-    # ports:
-    #   - "4317:4317"
-    #   - "4318:4318"

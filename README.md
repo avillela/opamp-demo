@@ -6,28 +6,7 @@ This is the companion repository for the NDC London talk, [OpenTelemetry At Scal
 
 These tutorials showcase different ways in which OpAMP works.
 
-### Tutorial 1 - OpAMP Server + OpAMP Supervisor Binary + OTel Collector Binary
-
-In this scenario, both the OpAMP Supervisor and the OpenTelemetry Collector run as native binaries on your local machine. This is the simplest way to understand how the Supervisor manages a Collector and is ideal for both local development and configuring production-ready Supervisors on VMs or bare-metal servers.
-
-1- Start the OpAMP server
-
-Open up a new terminal window and run:
-
-```bash
-docker compose up opamp-server
-```
-
-2- Start the OpAMP Supervisor binary
-
-```bash
-opampsupervisor --config ./src/opamp-supervisor/supervisor-3.yaml
-```
-
-The Supervisor will launch the Collector as a managed subprocess and begin reporting health, logs, metrics, and effective configuration over OpAMP.
-This local-binary setup is recommended for most initial use cases and is the easiest way to understand how OpAMP works end to end.
-
-### Tutorial 2 - OpAMP Server + OTel Collector with OpAMP Extension
+### Tutorial 1 - OpAMP Server + OTel Collector with OpAMP Extension
 
 In this scenario, we'll be running the [OpAMP Go Server](https://github.com/open-telemetry/opamp-go/tree/main/internal/examples/server) and an [OTel Collector](https://github.com/open-telemetry/opentelemetry-collector-contrib) with the [OpAMP Extension](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/opampextension).
 
@@ -35,13 +14,7 @@ Since the OpAMP Extension only reports on configuration state, you will not be a
 
 1- Run the OpAMP Server
 
-Open up a new terminal window and build the OpAMP Go server.
-
-```bash
-docker compose build opamp-server --no-cache
-```
-
-Now, start up the OpAMP server.
+Open up a new terminal window and start up the OpAMP Server. Note that the first time you run this, it will build the image if it doesn't already exist.
 
 ```bash
 docker compose up opamp-server
@@ -55,7 +28,7 @@ This starts the OpAMP Go server, listening at port `4320`. You can see what serv
 
 2- Run the OTel Collector
 
-Open up a new terminal window, and start up the OTel Collector.
+Open up a new terminal window, and start up the OTel Collector. Note that the first time you run this, it will build the image if it doesn't already exist.
 
 ```bash
 docker compose up otel-collector
@@ -69,6 +42,36 @@ If you click on your OTel Collector, you'll see the Collector config, and a spot
 
 ![OpAMP server](/images/opamp-server-collector-config.png)
 
+### Tutorial 2 - OpAMP Server + OpAMP Supervisor Binary + OTel Collector Binary
+
+In this scenario, both the OpAMP Supervisor and the OpenTelemetry Collector run as native binaries on your local machine. This is the simplest way to understand how the Supervisor manages a Collector and is ideal for both local development and configuring production-ready Supervisors on VMs or bare-metal servers.
+
+1- Start the OpAMP server
+
+Open up a new terminal window start the OpAMP Server. Note that the first time you run this, it will build the image if it doesn't already exist.
+
+```bash
+docker compose up opamp-server
+```
+
+2- Start the OpAMP Supervisor binary
+
+If you're running this in a Dev Container, the OpAMP Supervisor and OTel Collector were installed in [install-otel-components.sh](/.devcontainer/install-otel-components.sh) on initial Dev Container build.
+
+If you're not running this using the Dev Container, install the OpAMP Supervisor and OTel Collector binaries on your local filesystem by running:
+
+```bash
+./.devcontainer/install-otel-components.sh
+```
+
+And then start up the OpAMP Supervisor binary:
+
+```bash
+opampsupervisor --config ./src/opamp-supervisor/supervisor-3.yaml
+```
+
+The Supervisor will launch the Collector as a managed subprocess and begin reporting health, logs, metrics, and effective configuration over OpAMP.
+This local-binary setup is recommended for most initial use cases and is the easiest way to understand how OpAMP works end to end.
 
 ### Tutorial 3 - OpAMP Server + OpAMP Supervisor + OTel Collector
 
@@ -86,17 +89,7 @@ Open up a new terminal window and run:
 docker compose up opamp-server
 ```
 
-2- Start the first OpAMP Supervisor
-
-Open up a new terminal window and run:
-
-```bash
-docker compose up opamp-supervisor-1
-```
-
-As we saw in Tuorial 1, the Supervisor will launch the Collector binary on the filesystem as a managed subprocess and begin reporting health, logs, metrics, and effective configuration over OpAMP.
-
-3- Start the second OpAMP Supervisor
+2- Start the OpAMP Supervisor
 
 Open up a new terminal window and run the following command. Note that the first time you run this, it will build the image if it doesn't already exist.
 
@@ -105,8 +98,6 @@ docker compose up opamp-supervisor-2
 ```
 
 Again, the Supervisor will launch the Collector as a managed subprocess, but it will do so within the custom Supervisor/Collector combination container.
-
-You should see 2 collectors registered with the OpAMP Sever.
 
 ![OpAMP server](/images/opamp-server-2-collectors.png)
 

@@ -15,7 +15,7 @@ capabilities:
 agent:
   executable: /usr/local/bin/otelcol-contrib
   config_files:
-      - src/otel-collector/otelcol-config.yaml
+      - src/otel-collector/otelcol-config-3.yaml
 
 
 storage:
