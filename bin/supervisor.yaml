@@ -1,0 +1,18 @@
+## Reference: https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/cmd/opampsupervisor/examples/supervisor_docker.yaml#L18-L22
+server:
+  endpoint: wss://localhost:4320/v1/opamp
+  tls:
+    insecure_skip_verify: true
+capabilities:
+  reports_effective_config: true
+  reports_own_metrics: true
+  reports_own_logs: true
+  reports_health: true
+  accepts_remote_config: true
+  reports_remote_config: true
+agent:
+  executable: ./otelcol-contrib
+  config_files:
+    - ./otelcol-config.yaml
+storage:
+  directory: ./supervisor-data
