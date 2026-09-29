@@ -6,7 +6,7 @@ services:
 
   opamp-supervisor-1:
     container_name: opamp-supervisor-1
-    image: otel/opentelemetry-collector-opampsupervisor:latest
+    image: otel/opentelemetry-collector-opampsupervisor:0.161.0
     command: ["--config", "/etc/otel/supervisor.yaml"]
     volumes:
       - ./src/opamp-supervisor/supervisor.yaml:/etc/otel/supervisor.yaml
@@ -47,7 +47,7 @@ services:
 
   # OpenTelemetry Collector
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.143.0
+    image: otel/opentelemetry-collector-contrib:0.161.0
     container_name: otelcol
     deploy:
       resources:

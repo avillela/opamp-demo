@@ -4,15 +4,6 @@ receivers:
       grpc: {}
       http: {}
 
-  # prometheus:
-  #   config:
-  #     scrape_configs:
-  #       # Collector metrics
-  #       - job_name: 'otel-collector'
-  #         scrape_interval: 10s
-  #         static_configs:
-  #         - targets: [ '0.0.0.0:8888' ]
-
 processors:
   batch: {}
   cumulativetodelta:

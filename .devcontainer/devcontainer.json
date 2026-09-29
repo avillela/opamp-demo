@@ -1,19 +1,25 @@
 {
     "name": "default",
-    "image": "mcr.microsoft.com/devcontainers/python:dev-3.13-bullseye",
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
     "features": {
-      "ghcr.io/devcontainers/features/node:1": {},
+      "ghcr.io/stu-bell/devcontainer-features/claude-code:0": {},
+      "ghcr.io/devcontainers/features/node:2": {},
+      "ghcr.io/devcontainers/features/python:1": {},
       "ghcr.io/devcontainers/features/go:1": {},
-      "ghcr.io/devcontainers-extra/features/kubectl-asdf:2": {},
       "ghcr.io/dhoeric/features/k9s:1": {},
-      "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+      "ghcr.io/devcontainers/features/docker-in-docker:4": {},
+      "ghcr.io/mpriscella/features/kind:1": {},
+      "ghcr.io/devcontainers/features/java:1": {},
     },
     "overrideFeatureInstallOrder": [
-        "ghcr.io/devcontainers/features/node",
-        "ghcr.io/devcontainers/features/go",
-        "ghcr.io/devcontainers-extra/features/kubectl-asdf",
-        "ghcr.io/dhoeric/features/k9s",
         "ghcr.io/devcontainers/features/docker-in-docker",
+        "ghcr.io/devcontainers/features/node",
+        "ghcr.io/devcontainers/features/python",
+        "ghcr.io/devcontainers/features/go",
+        "ghcr.io/devcontainers/features/java",
+        "ghcr.io/dhoeric/features/k9s",
+        "ghcr.io/mpriscella/features/kind",
+        "ghcr.io/stu-bell/devcontainer-features/claude-code",
     ],
     "hostRequirements": {
       "cpus": 4,
@@ -21,8 +27,14 @@
       "storage": "16gb"
     },
     "remoteEnv": {
-      "PODMAN_USERNS": "keep-id"
+      "PODMAN_USERNS": "keep-id",
     },
     "containerUser": "vscode",
+    "runArgs": [
+      "--init" // Recommended for proper process management
+    ],
+    "capAdd": [
+      "IPC_LOCK"
+    ],
     "postCreateCommand": ".devcontainer/post-create.sh",
   }
