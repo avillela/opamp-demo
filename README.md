@@ -71,7 +71,33 @@ opampsupervisor --config ./src/opamp-supervisor/supervisor-3.yaml
 ```
 
 The Supervisor will launch the Collector as a managed subprocess and begin reporting health, logs, metrics, and effective configuration over OpAMP.
+
 This local-binary setup is recommended for most initial use cases and is the easiest way to understand how OpAMP works end to end.
+
+3- Update the Collector configuration
+
+Let's test a quick configuration change by changing the verbosity of the debug exporter from `basic` in the `Additional Configuration` text box:
+
+```yaml
+exporters:
+  debug:
+    verbosity: detailed
+```
+
+![Before config change](/images/opamp-server-config-change-before.png)
+
+to `basic`:
+
+```yaml
+exporters:
+  debug:
+    verbosity: basic
+```
+
+Click `Save and Send to Agent`, and refresh the screen.
+
+![Before config change](/images/opamp-server-config-change-after.png)
+
 
 ### Tutorial 3 - OpAMP Server + OpAMP Supervisor + OTel Collector
 
@@ -101,6 +127,25 @@ Again, the Supervisor will launch the Collector as a managed subprocess, but it 
 
 ![OpAMP server](/images/opamp-server-2-collectors.png)
 
+3- Update the Collector configuration
+
+Add a Prometheus receiver configuration to the OTel Collector in the `Additional Configuration` text box:
+
+```yaml
+receivers:
+  prometheus:
+    config:
+      scrape_configs:
+        # Collector metrics
+        - job_name: 'otel-collector'
+          scrape_interval: 10s
+          static_configs:
+          - targets: [ '0.0.0.0:8888' ]
+```
+
+Click `Save and Send to Agent`, and refresh the screen.
+
+![Before adding Prometheus receiver](/images/opamp-server-config-change-prom.png)
 
 ## OpAMP Servers
 
