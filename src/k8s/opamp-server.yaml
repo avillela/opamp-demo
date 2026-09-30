@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opamp-server
+  namespace: opamp-bridge-demo
+  labels:
+    app: opamp-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opamp-server
+  template:
+    metadata:
+      labels:
+        app: opamp-server
+    spec:
+      containers:
+        - name: opamp-server
+          image: opamp-server:latest
+          imagePullPolicy: Never
+          ports:
+            - name: opamp
+              containerPort: 4320
+            - name: ui
+              containerPort: 4321
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opamp-server
+  namespace: opamp-bridge-demo
+spec:
+  selector:
+    app: opamp-server
+  ports:
+    - name: opamp
+      protocol: TCP
+      port: 4320
+      targetPort: opamp
+    - name: ui
+      protocol: TCP
+      port: 4321
+      targetPort: ui

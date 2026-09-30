@@ -1,0 +1,24 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpAMPBridge
+metadata:
+  labels:
+    app: opamp-bridge-sa
+  name: opamp-bridge
+  namespace: opamp-bridge-demo
+spec:
+  serviceAccount: opamp-bridge-sa
+  endpoint: "ws://opamp-server.opamp-bridge-demo.svc.cluster.local:4320/v1/opamp"
+  tls:
+    insecure_skip_verify: true
+  capabilities:
+    AcceptsRemoteConfig: true
+    ReportsEffectiveConfig: true
+    ReportsHealth: true
+    ReportsRemoteConfig: true
+  componentsAllowed:
+    receivers:
+      - otlp
+    processors:
+      - batch
+    exporters:
+      - debug

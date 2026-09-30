@@ -1,0 +1,60 @@
+# API reference https://github.com/open-telemetry/opentelemetry-operator/blob/main/docs/api.md
+# Refs for v1beta1 config: https://github.com/open-telemetry/opentelemetry-operator/issues/3011#issuecomment-2154118998
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: otel
+  namespace: opamp-bridge-demo
+  labels:
+    app.kubernetes.io/name: opentelemetry-collector
+    app.kubernetes.io/version: "0.161.0"
+    app.kubernetes.io/component: opentelemetry-operator
+    opentelemetry.io/opamp-managed: "true"
+    # opentelemetry.io/opamp-reporting: "true"
+spec:
+  mode: statefulset
+  image: otel/opentelemetry-collector-contrib:0.161.0
+  imagePullPolicy: Always
+  serviceAccount: otelcontribcol
+  autoscaler:
+    minReplicas: 1
+    maxReplicas: 2
+    targetCPUUtilization: 50
+    targetMemoryUtilization: 60
+  resources:
+    limits:
+      cpu: 200m
+      memory: 500Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+
+  config:
+    receivers:
+      otlp:
+        protocols:
+          grpc: {}
+          http: {}
+
+    processors:
+      batch: {}
+
+    exporters:
+      debug:
+        verbosity: detailed
+
+    service:
+      pipelines:
+        traces:
+          receivers: [ otlp ]
+          processors: [ batch ]
+          exporters: [ debug ]
+        metrics:
+          receivers: [ otlp ]
+          processors: [ batch ]
+          exporters: [ debug ]
+        logs:
+          receivers: [ otlp ]
+          processors: [ batch ]
+          exporters: [ debug ]

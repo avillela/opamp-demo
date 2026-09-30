@@ -147,6 +147,25 @@ Click `Save and Send to Agent`, and refresh the screen.
 
 ![Before adding Prometheus receiver](/images/opamp-server-config-change-prom.png)
 
+### Tutorial 4 - OpAMP Bridge
+
+```bash
+# Create KinD Cluster
+./src/scripts/00-create-kind-cluster.sh
+
+# Install OTel Operator (and Cert Manager)
+./src/scripts/01-install-otel-operator.sh
+
+# Load OpAMP Server image
+./src/scripts/02-load-kind-images.sh
+
+# Deploy k8s resources
+./src/scripts/03-deploy-k8s-resources.sh
+
+# Port-forward OpAMP server
+kubectl port-forward svc/opamp-server 4321:4321 -n opamp-bridge-demo
+```
+
 ## OpAMP Servers
 
 The OpAMP Go server is just one example of an OpAMP server. Here are some examples:
