@@ -149,21 +149,33 @@ Click `Save and Send to Agent`, and refresh the screen.
 
 ### Tutorial 4 - OpAMP Bridge
 
+OpAMP Server creates Collector CR and sends it to the OpAMP Bridge to put the CR in the cluster. The Operator then CR and creates the Collector resources (e.g. ConfigMap, Deployment/StatefulSet/DaemonSet).
+
 ```bash
+# Build the Elixir Dockerfile locally
+mkdir tmp && cd tmp
+git clone https://github.com/jaronoff97/opamp-elixir.git
+sed -i 's/ARG DEBIAN_VERSION=bullseye-20230612-slim/ARG DEBIAN_VERSION=bookworm-20260610-slim/' ./tmp/opamp-elixir/Dockerfile # fix a build error in Dockerfile
+cd opamp-elixir
+docker build -t opamp-server .
+
 # Create KinD Cluster
 ./src/scripts/00-create-kind-cluster.sh
 
 # Install OTel Operator (and Cert Manager)
 ./src/scripts/01-install-otel-operator.sh
 
+# Deploy OpAMP Bridge (configured for Bindplane)
+./src/scripts/03-deploy-bindplane-bridge.sh .env
+
 # Load OpAMP Server image
-./src/scripts/02-load-kind-images.sh
+# ./src/scripts/02-load-kind-images.sh
 
 # Deploy k8s resources
-./src/scripts/03-deploy-k8s-resources.sh
+# ./src/scripts/03-deploy-k8s-resources.sh
 
 # Port-forward OpAMP server
-kubectl port-forward svc/opamp-server 4321:4321 -n opamp-bridge-demo
+# kubectl port-forward svc/opamp-server 4320:4320 -n opamp-bridge-demo
 ```
 
 ## OpAMP Servers

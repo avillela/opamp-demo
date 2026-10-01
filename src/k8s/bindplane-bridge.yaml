@@ -1,0 +1,136 @@
+# operator-opamp-bridge, deployed as an OpAMPBridge custom resource that the
+# OpenTelemetry Operator reconciles into the bridge Deployment. The bridge
+# connects out to Bindplane, receives the kubernetes-operator AgentConfigMap
+# over OpAMP, and reconciles each entry into an OpenTelemetryCollector CRD.
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: otel-bridge
+  namespace: "bindplane"
+---
+# The bridge manages OpenTelemetryCollector CRDs.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: otel-bridge
+rules:
+  - apiGroups: ["opentelemetry.io"]
+    resources: [opentelemetrycollectors]
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: otel-bridge
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: otel-bridge
+subjects:
+  - kind: ServiceAccount
+    name: otel-bridge
+    namespace: "bindplane"
+---
+# Union of the cluster read permissions the collectors this install can deploy
+# will need (k8s_events, k8sobjects, kubeletstats, k8s_cluster, ...).
+#
+# The operator's admission webhook blocks privilege escalation on every
+# OpenTelemetryCollector create/update: the requester may only write a collector
+# whose config requires permissions the requester itself holds. The bridge
+# creates collectors and the operator updates them while reconciling, so both
+# ServiceAccounts are bound to this role.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: bindplane-collector-permissions
+rules:
+  - apiGroups: [""]
+    resources:
+      - events
+      - namespaces
+      - namespaces/status
+      - nodes
+      - nodes/spec
+      - nodes/stats
+      - nodes/proxy
+      - pods
+      - pods/status
+      - persistentvolumeclaims
+      - persistentvolumes
+      - replicationcontrollers
+      - replicationcontrollers/status
+      - resourcequotas
+      - services
+    verbs: [get, list, watch]
+  - apiGroups: ["apps"]
+    resources: [daemonsets, deployments, replicasets, statefulsets]
+    verbs: [get, list, watch]
+  # The operator computes the k8s_cluster receiver's required RBAC as the
+  # legacy extensions group and HPAs in addition to apps.
+  - apiGroups: ["extensions"]
+    resources: [daemonsets, deployments, replicasets]
+    verbs: [get, list, watch]
+  - apiGroups: ["autoscaling"]
+    resources: [horizontalpodautoscalers]
+    verbs: [get, list, watch]
+  - apiGroups: ["batch"]
+    resources: [jobs, cronjobs]
+    verbs: [get, list, watch]
+  - apiGroups: ["events.k8s.io"]
+    resources: [events]
+    verbs: [get, list, watch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: bindplane-collector-permissions
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: bindplane-collector-permissions
+subjects:
+  - kind: ServiceAccount
+    name: otel-bridge
+    namespace: "bindplane"
+  - kind: ServiceAccount
+    name: "opentelemetry-operator-controller-manager"
+    namespace: "opentelemetry-operator-system"
+---
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpAMPBridge
+metadata:
+  # The operator names the bridge's Deployment and pods after this, so the
+  # bridge shows up in Bindplane as "<cluster>-opamp-bridge-...".
+  name: "opamp-demo-cluster"
+  namespace: "bindplane"
+spec:
+  serviceAccount: otel-bridge
+  endpoint: "wss://app.bindplane.com/v1/opamp"
+  tls:
+    insecure_skip_verify: true
+  env:
+    - name: BINDPLANE_SECRET_KEY
+      valueFrom:
+        secretKeyRef:
+          name: bindplane-secrets
+          key: secret-key
+    - name: BINDPLANE_AGENT_ID
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.uid
+  headers:
+    Authorization: "Secret-Key ${BINDPLANE_SECRET_KEY}"
+    Agent-Id: "${BINDPLANE_AGENT_ID}"
+  description:
+    non_identifying_attributes:
+      service.labels: "configuration=opamp-demo-cluster,ephemeral=true"
+  capabilities:
+    AcceptsRemoteConfig: true
+    ReportsRemoteConfig: true
+    ReportsEffectiveConfig: true
+    ReportsHealth: true
+    ReportsStatus: true
+  # componentsAllowed is intentionally omitted: when set, the bridge treats it
+  # as a strict allow-list (no "*" wildcard) and rejects any component not
+  # listed. Omitting it allows all components in the rendered collector config.

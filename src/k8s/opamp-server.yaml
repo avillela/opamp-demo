@@ -17,20 +17,11 @@ spec:
     spec:
       containers:
         - name: opamp-server
-          image: opamp-server:latest
+          image: ghcr.io/avillela/opamp-server:20260930
           imagePullPolicy: Never
           ports:
             - name: opamp
               containerPort: 4320
-            - name: ui
-              containerPort: 4321
-          resources:
-            requests:
-              cpu: 100m
-              memory: 128Mi
-            limits:
-              cpu: 500m
-              memory: 256Mi
 ---
 apiVersion: v1
 kind: Service
@@ -45,7 +36,3 @@ spec:
       protocol: TCP
       port: 4320
       targetPort: opamp
-    - name: ui
-      protocol: TCP
-      port: 4321
-      targetPort: ui
