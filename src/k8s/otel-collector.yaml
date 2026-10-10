@@ -4,7 +4,7 @@ apiVersion: opentelemetry.io/v1beta1
 kind: OpenTelemetryCollector
 metadata:
   name: otel
-  namespace: opamp-bridge-demo
+  namespace: opamp
   labels:
     app.kubernetes.io/name: opentelemetry-collector
     app.kubernetes.io/version: "0.161.0"

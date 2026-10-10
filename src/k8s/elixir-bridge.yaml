@@ -4,13 +4,13 @@ metadata:
   labels:
     app: opamp-bridge-sa
   name: opamp-bridge
-  namespace: opamp-bridge-demo
+  namespace: opamp
 spec:
   serviceAccount: opamp-bridge-sa
-  # endpoint: "ws://opamp-server.opamp-bridge-demo.svc.cluster.local:4320/v1/opamp"
-  endpoint: "ws://172.19.0.1:4320/v1/opamp"
-  # tls:
-  #   insecure_skip_verify: true
+  endpoint: "ws://opamp-server.opamp.svc:4320/v1/opamp"
+  tls:
+    insecure: true
+    # insecure_skip_verify: true
   capabilities:
     AcceptsRemoteConfig: true
     ReportsEffectiveConfig: true

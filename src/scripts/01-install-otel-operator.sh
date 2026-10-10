@@ -18,7 +18,7 @@ kubectl apply -f src/k8s/operator-rbac.yaml
 
 ## Install the OTel Operator and wait for its webhook to be ready.
 echo "*********** Deploying the OpenTelemetry Operator ***********"
-kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/download/v0.156.0/opentelemetry-operator.yaml
+kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/download/v0.160.0/opentelemetry-operator.yaml
 echo "Waiting for the operator to start (up to 5 minutes)..."
 kubectl wait --for=condition=Available deployment/opentelemetry-operator-controller-manager -n opentelemetry-operator-system --timeout=300s
 echo "Waiting for the operator webhook's CA to be issued..."

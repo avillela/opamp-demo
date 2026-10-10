@@ -4,7 +4,7 @@ metadata:
   labels:
     app: opamp-bridge-sa
   name: opamp-bridge-sa
-  namespace: opamp-bridge-demo
+  namespace: opamp
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -32,7 +32,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: opamp-bridge-sa
-  namespace: opamp-bridge-demo
+  namespace: opamp
 roleRef:
   kind: ClusterRole
   name: opamp-bridge-role
