@@ -2,7 +2,6 @@
 # OpenTelemetry Operator reconciles into the bridge Deployment. The bridge
 # connects out to Bindplane, receives the kubernetes-operator AgentConfigMap
 # over OpAMP, and reconciles each entry into an OpenTelemetryCollector CRD.
-
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -102,13 +101,11 @@ kind: OpAMPBridge
 metadata:
   # The operator names the bridge's Deployment and pods after this, so the
   # bridge shows up in Bindplane as "<cluster>-opamp-bridge-...".
-  name: "opamp-demo-cluster"
+  name: "av-opamp2"
   namespace: "bindplane"
 spec:
   serviceAccount: otel-bridge
   endpoint: "wss://app.bindplane.com/v1/opamp"
-  tls:
-    insecure_skip_verify: true
   env:
     - name: BINDPLANE_SECRET_KEY
       valueFrom:
@@ -124,7 +121,7 @@ spec:
     Agent-Id: "${BINDPLANE_AGENT_ID}"
   description:
     non_identifying_attributes:
-      service.labels: "configuration=opamp-demo-cluster,ephemeral=true"
+      service.labels: "configuration=av-opamp2,ephemeral=true"
   capabilities:
     AcceptsRemoteConfig: true
     ReportsRemoteConfig: true

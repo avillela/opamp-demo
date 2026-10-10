@@ -3,7 +3,7 @@
 apiVersion: opentelemetry.io/v1beta1
 kind: OpenTelemetryCollector
 metadata:
-  name: otel
+  name: otel-2
   namespace: opamp
   labels:
     app.kubernetes.io/name: opentelemetry-collector
