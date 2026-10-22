@@ -1,0 +1,118 @@
+# The opamp-elixir server. Agents connect to ws://opamp-server.opamp.svc:4320/v1/opamp,
+# and the UI is on the same port.
+apiVersion: v1
+kind: Service
+metadata:
+  name: opamp-server
+  labels:
+    app.kubernetes.io/name: opamp-server
+    app.kubernetes.io/part-of: opamp-elixir
+spec:
+  selector:
+    app.kubernetes.io/name: opamp-server
+  ports:
+    - name: http
+      port: 4320
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opamp-server
+  labels:
+    app.kubernetes.io/name: opamp-server
+    app.kubernetes.io/part-of: opamp-elixir
+spec:
+  # ponytail: one replica. Each agent's state lives in the node that holds its connection,
+  # and the UI gets updates over local PubSub. More replicas need Erlang clustering
+  # (DNS_CLUSTER_QUERY with a headless Service) first.
+  replicas: 1
+  # Stop the old server before the new one starts: an old server deletes its agents when
+  # their connections close, which would race the new server that the agents reconnect to.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: opamp-server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: opamp-server
+        app.kubernetes.io/part-of: opamp-elixir
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        # The image runs as nobody.
+        runAsUser: 65534
+        runAsGroup: 65534
+      initContainers:
+        - name: migrate
+          image: ghcr.io/jaronoff97/opamp-elixir:sha-533d769
+          command: ["/app/bin/migrate"]
+          env: &env
+            # The Erlang node name uses the pod IP (see rel/env.sh.eex).
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: PGHOST
+              value: opamp-postgres
+            - name: PGPORT
+              value: "5432"
+            - name: PGDATABASE
+              value: opamp_server
+            - name: PGUSER
+              value: opamp
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: opamp-server
+                  key: PGPASSWORD
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: opamp-server
+                  key: SECRET_KEY_BASE
+            - name: PORT
+              value: "4320"
+            # The public URL of the UI. LiveView accepts browser connections only from it.
+            # The defaults suit `kubectl port-forward svc/opamp-server 4320`. Behind an
+            # ingress, set for example PHX_HOST=opamp.example.com, PHX_SCHEME=https and
+            # PHX_URL_PORT=443.
+            - name: PHX_HOST
+              value: localhost
+            - name: PHX_SCHEME
+              value: http
+            # Optional: connection settings offers, a CA for agent CSRs, and a TLS listener.
+            # Mount the files from a Secret and set OPAMP_CONNECTION_SETTINGS_FILE,
+            # OPAMP_CA_CERT_FILE, OPAMP_CA_KEY_FILE, OPAMP_TLS_CERT_FILE and
+            # OPAMP_TLS_KEY_FILE. See the README.
+          securityContext: &container_security
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+      containers:
+        - name: server
+          image: ghcr.io/jaronoff97/opamp-elixir
+          env: *env
+          ports:
+            - name: http
+              containerPort: 4320
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          # resources:
+          #   requests:
+          #     cpu: 100m
+          #     memory: 256Mi
+          #   limits:
+          #     memory: 1Gi
+          securityContext: *container_security

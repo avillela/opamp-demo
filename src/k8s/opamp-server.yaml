@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opamp-server
+  namespace: opamp-bridge-demo
+  labels:
+    app: opamp-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opamp-server
+  template:
+    metadata:
+      labels:
+        app: opamp-server
+    spec:
+      containers:
+        - name: opamp-server
+          image: ghcr.io/avillela/opamp-server:20260930
+          imagePullPolicy: Never
+          ports:
+            - name: opamp
+              containerPort: 4320
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opamp-server
+  namespace: opamp-bridge-demo
+spec:
+  selector:
+    app: opamp-server
+  ports:
+    - name: opamp
+      protocol: TCP
+      port: 4320
+      targetPort: opamp

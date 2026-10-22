@@ -1,0 +1,20 @@
+# The opamp-elixir server and a Postgres for it.
+#
+#   kubectl create namespace opamp
+#   kubectl -n opamp create secret generic opamp-server \
+#     --from-literal=SECRET_KEY_BASE="$(openssl rand -base64 48)" \
+#     --from-literal=PGPASSWORD="$(openssl rand -hex 16)"
+#   kubectl apply -k deploy/kubernetes
+#
+# See README.md in this folder.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: opamp
+resources:
+  - namespace.yaml
+  - postgres.yaml
+  - server.yaml
+images:
+  # Change newName and newTag to use another image, for example a local build.
+  - name: ghcr.io/jaronoff97/opamp-elixir
+    newTag: latest

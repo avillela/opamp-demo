@@ -1,0 +1,75 @@
+# A single Postgres for the server. To use your own database instead, remove this file from
+# kustomization.yaml and set PGHOST, PGPORT, PGDATABASE and PGUSER in server.yaml.
+apiVersion: v1
+kind: Service
+metadata:
+  name: opamp-postgres
+  labels:
+    app.kubernetes.io/name: opamp-postgres
+    app.kubernetes.io/part-of: opamp-elixir
+spec:
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: opamp-postgres
+  ports:
+    - name: postgres
+      port: 5432
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: opamp-postgres
+  labels:
+    app.kubernetes.io/name: opamp-postgres
+    app.kubernetes.io/part-of: opamp-elixir
+spec:
+  serviceName: opamp-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: opamp-postgres
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: opamp-postgres
+        app.kubernetes.io/part-of: opamp-elixir
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16
+          ports:
+            - name: postgres
+              containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: opamp_server
+            - name: POSTGRES_USER
+              value: opamp
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: opamp-server
+                  key: PGPASSWORD
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "opamp", "-d", "opamp_server"]
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi

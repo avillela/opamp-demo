@@ -1,0 +1,37 @@
+# Grants the upstream OpenTelemetry Operator permission to create the
+# per-collector ClusterRole/ClusterRoleBinding that cluster receivers
+# (k8s_events, k8sobjects, kubeletstats, k8s_cluster, ...) require.
+#
+# At startup the operator runs a SubjectAccessReview to decide whether it can
+# manage cluster-scoped RBAC, and caches the answer. Without this grant in place
+# first, it silently skips RBAC creation and collector pods fail their cluster
+# API calls with 403 until the operator is restarted — so this is applied ahead
+# of the upstream operator release manifest.
+#
+# The subject is the controller-manager ServiceAccount that release creates.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: opentelemetry-operator-rbac-creator
+rules:
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["clusterroles", "clusterrolebindings"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # bind/escalate are required so the operator can create ClusterRoleBindings
+  # that reference the rules it generates.
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["clusterroles"]
+    verbs: ["bind", "escalate"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: opentelemetry-operator-rbac-creator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: opentelemetry-operator-rbac-creator
+subjects:
+  - kind: ServiceAccount
+    name: opentelemetry-operator-controller-manager
+    namespace: opentelemetry-operator-system

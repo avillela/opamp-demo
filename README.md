@@ -147,12 +147,69 @@ Click `Save and Send to Agent`, and refresh the screen.
 
 ![Before adding Prometheus receiver](/images/opamp-server-config-change-prom.png)
 
+### Tutorial 4 - OpAMP Bridge with Bindplane
+
+Bindplane OpAMP Server creates Collector CR and sends it to the OpAMP Bridge to put the CR in the cluster. The Operator then CR and creates the Collector resources (e.g. ConfigMap, Deployment/StatefulSet/DaemonSet).
+
+1- Create KinD cluster
+
+```bash
+./src/scripts/00-create-kind-cluster.sh
+```
+
+2- Configure your cluster with Bindplane
+
+* Go to hamburger menu, and select `Kubernetes Clusters`
+* Click `Connect Cluster` button, and give it a name
+* Run the scripts below to set up:
+
+      ```bash
+      # Install OTel Operator (and Cert Manager)
+      ./src/scripts/01-install-otel-operator.sh
+
+      # Deploy OpAMP Bridge (configured for Bindplane)
+      ./src/scripts/03-deploy-bindplane-bridge.sh .env
+      ```
+
+* Click `Add Collector Workload`, select `Kubernetes Node`, and give it a name
+* Once the Collector is deployed, click on the hyperlink under `Configuration` for the node just created
+* Add a source: select `Kubernetes Container`
+  - Set `Cluster Name` to your cluster name (in our case, `otel-opamp-demo`)
+* Add a destination: `dev-null`
+  - Select `dev null` from the set of options
+* Click `Start Rollout`
+
+### Tutorial 5 - OpAMP Bridge with Elixir OpAMP Server
+
+Install Elixir OpAMP Server, deploy OpAMP Bridge, and deploy Collectors
+
+```bash
+# Create KinD Cluster
+./src/scripts/00-create-kind-cluster.sh
+
+# Install OTel Operator (and Cert Manager)
+./src/scripts/01-install-otel-operator.sh
+
+# Load images into KinD
+./src/scripts/02-load-kind-images.sh
+
+# Deploy the Elixir OpAMP server
+./src/scripts/03-deploy-elixir-server.sh
+
+# Deploy OpAMP Bridge (configured for Elixir server)
+./src/scripts/04-deploy-elixir-bridge.sh
+
+# Apply port-forward to access OpAMP server (new terminal)
+kubectl -n opamp port-forward svc/opamp-server 4320
+```
+
 ## OpAMP Servers
 
-The OpAMP Go server is just one example of an OpAMP server. Here are some examples:
-* [OpAMP Go server (OpenTelemetry)](https://github.com/open-telemetry/opamp-go/tree/main/internal/examples/server)
-* [OpAMP Elixir server (Jacob Aronoff)](https://github.com/jaronoff97/opamp-elixir)
-* [OpAMP Python server (Adam Gardner)](https://github.com/agardnerIT/opamp-server-py)
+Check out some of the OpAMP servers out there:
+* [OpAMP Go server (OpenTelemetry - not prod-ready)](https://github.com/open-telemetry/opamp-go/tree/main/internal/examples/server)
+* [OpAMP Elixir server (Jacob Aronoff - not prod-ready)](https://github.com/jaronoff97/opamp-elixir)
+* [OpAMP Python server (Adam Gardner - not prod-ready)](https://github.com/agardnerIT/opamp-server-py)
+* [Bindplane (commercial)](https://bindplane.com)
 
 >! 🚨 **NOTE**: These are NOT production-ready servers. Use at your own risk.
 
