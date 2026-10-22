@@ -16,10 +16,10 @@ spec:
     ReportsEffectiveConfig: true
     ReportsHealth: true
     ReportsRemoteConfig: true
-  componentsAllowed:
-    receivers:
-      - otlp
-    processors:
-      - batch
-    exporters:
-      - debug
+  # componentsAllowed:
+  #   receivers:
+  #     - otlp
+  #   processors:
+  #     - batch
+  #   exporters:
+  #     - debug
